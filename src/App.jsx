@@ -2,6 +2,8 @@ import { useState } from 'react';
 import AttributeBox from './components/AttributeBox';
 import SkillRow     from './components/SkillRow';
 import CardList     from './components/CardList';
+import InventoryList from './components/InventoryList';
+
 
 export default function App() {
   const [editable, setEditable] = useState(false);
@@ -105,6 +107,8 @@ export default function App() {
         keyPrefix="perks"
         editable={editable}
       />
+      <InventoryList editable={editable} />
+
     </div>
   );
 }
