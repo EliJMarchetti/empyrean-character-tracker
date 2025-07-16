@@ -1,12 +1,14 @@
-import { useState }  from 'react';
-import AttributeBox  from './components/AttributeBox';
-import SkillRow      from './components/SkillRow';
+import { useState } from 'react';
+import AttributeBox from './components/AttributeBox';
+import SkillRow     from './components/SkillRow';
+import CardList     from './components/CardList';
 
 export default function App() {
   const [editable, setEditable] = useState(false);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      {/* background image */}
       <img
         src="./background.jpeg"
         alt="Empyrean background"
@@ -20,15 +22,16 @@ export default function App() {
         </h1>
 
         <div className="flex items-center gap-4">
-          {/* global edit‑mode toggle */}
+          {/* global edit‑mode button */}
           <button
-             onClick={() => setEditable(e => !e)}
-              className={`bg-black/60 px-3 py-2 rounded border ${
+            onClick={() => setEditable(e => !e)}
+            className={`bg-black/60 px-3 py-2 rounded border ${
               editable ? 'border-white' : 'border-white/20'
-             } transition-colors`}
-        >
-          Edit Character
+            } transition-colors`}
+          >
+            Edit Character
           </button>
+
           {/* character selector placeholder */}
           <select className="bg-black/60 px-3 py-2 rounded border border-white/20">
             <option value="">New / Load…</option>
@@ -36,7 +39,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* Attributes */}
+      {/* ── Attributes ───────────────────────────────────── */}
       <section className="grid grid-cols-5 gap-4 p-6">
         {[
           { id: 'might',  label: 'Might'  },
@@ -49,7 +52,7 @@ export default function App() {
         ))}
       </section>
 
-      {/* Skills */}
+      {/* ── Skills ───────────────────────────────────────── */}
       <section className="grid grid-cols-3 gap-4 px-6 pb-10">
         {[
           [
@@ -81,6 +84,26 @@ export default function App() {
           </div>
         ))}
       </section>
+
+      {/* ── Specializations / Talents / Perks ───────────── */}
+      <CardList
+        title="Specializations"
+        keyPrefix="specs"
+        editable={editable}
+      />
+
+      <CardList
+        title="Talents"
+        keyPrefix="talents"
+        editable={editable}
+        showSkill={true}        
+      />
+
+      <CardList
+        title="Perks"
+        keyPrefix="perks"
+        editable={editable}
+      />
     </div>
   );
 }
