@@ -2,69 +2,91 @@ import { useState } from 'react';
 
 const SUITS = ['♥', '♣', '♦', '♠'];
 const WEAPON_RANGES = ['Melee', 'Ranged', 'Long Ranged'];
+const MARK_CYCLE = ['', '+', '++', '–', '––'];
 
 export default function InventoryCard({ item, editable, onChange, onDelete }) {
   const [open, setOpen] = useState(false);
 
-  /* helpers */
-  const patch = p => onChange({ ...item, ...p });
+  /* helpers --------------------------------------------------------- */
+  const patch = (p) => onChange({ ...item, ...p });
 
-  /* suit toggle for Gear */
-  const toggleSuit = s =>
+  /* Gear suit toggle */
+  const toggleSuit = (s) =>
     patch({
       suits: item.suits.includes(s)
-        ? item.suits.filter(x => x !== s)
+        ? item.suits.filter((x) => x !== s)
         : [...item.suits, s],
     });
 
+  /* Weapon skill‑mark cycle */
+  const advanceMark = () =>
+    patch({
+      skillMark:
+        MARK_CYCLE[(MARK_CYCLE.indexOf(item.skillMark || '') + 1) % MARK_CYCLE.length],
+    });
+
+  /* --------------------------------------------------------------- */
   return (
     <div className="bg-black/40 border border-white/20 mb-2">
-      {/* header */}
+      {/* ---------- header ----------------------------------------- */}
       <div
         className="flex items-center justify-between px-3 py-2 cursor-pointer select-none"
-        onClick={() => setOpen(o => !o)}
+        onClick={() => setOpen((o) => !o)}
       >
-        {/* left side */}
         <div className="flex items-center gap-2">
+          {/* Name field */}
           {editable ? (
             <input
               className="bg-transparent outline-none"
               placeholder="Name…"
               value={item.title}
-              onChange={e => patch({ title: e.target.value })}
+              onChange={(e) => patch({ title: e.target.value })}
             />
           ) : (
             <span>{item.title || <em className="opacity-50">Untitled</em>}</span>
           )}
 
-          {/* header badges */}
+          {/* Gear suits */}
           {item.type === 'gear' && (
             <span>
-              {SUITS.map(s => (
-                <span
-                  key={s}
-                  className={`mx-0.5 ${
-                    item.suits.includes(s) ? '' : 'opacity-20'
-                  }`}
-                >
-                  {s}
-                </span>
-              ))}
+              {SUITS.map((s) => {
+                const active = item.suits.includes(s);
+                const color =
+                  active && (s === '♥' || s === '♦') ? 'text-red-500' : 'text-white';
+                return (
+                  <span
+                    key={s}
+                    className={`mx-0.5 ${active ? color : 'opacity-20'}`}
+                  >
+                    {s}
+                  </span>
+                );
+              })}
             </span>
           )}
 
-          {item.type === 'weapon' && item.skill && (
-            <span className="text-xs opacity-70">({item.skill})</span>
+          {/* Weapon skill + mark */}
+          {item.type === 'weapon' && (
+            <span
+              className={`text-xs flex items-center gap-1 ${
+                editable ? 'cursor-pointer' : ''
+              }`}
+              title="Cycle mark"
+              onClick={editable ? advanceMark : undefined}
+            >
+              ({item.skill || <em className="opacity-50">Skill</em>}
+              {item.skillMark && ` ${item.skillMark}`})
+            </span>
           )}
         </div>
 
         <span>{open ? '▾' : '▸'}</span>
       </div>
 
-      {/* body */}
+      {/* ---------- body ------------------------------------------- */}
       {open && (
         <div className="px-3 pb-3">
-          {/* TYPE‑SPECIFIC FIELDS */}
+          {/* ITEM --------------------------------------------------- */}
           {item.type === 'item' && (
             <textarea
               className="w-full bg-transparent outline-none resize-none"
@@ -72,37 +94,46 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
               placeholder="Description…"
               value={item.text}
               readOnly={!editable}
-              onChange={e => patch({ text: e.target.value })}
+              onChange={(e) => patch({ text: e.target.value })}
             />
           )}
 
+          {/* GEAR --------------------------------------------------- */}
           {item.type === 'gear' && (
             <>
               {/* suit picker */}
               {editable && (
                 <div className="mb-2">
-                  {SUITS.map(s => (
-                    <button
-                      key={s}
-                      className={`mx-0.5 ${
-                        item.suits.includes(s) ? '' : 'opacity-20'
-                      }`}
-                      onClick={() => toggleSuit(s)}
-                    >
-                      {s}
-                    </button>
-                  ))}
+                  {SUITS.map((s) => {
+                    const active = item.suits.includes(s);
+                    const color =
+                      active && (s === '♥' || s === '♦')
+                        ? 'text-red-500'
+                        : 'text-white';
+                    return (
+                      <button
+                        key={s}
+                        className={`mx-0.5 ${
+                          active ? color : 'opacity-20'
+                        }`}
+                        onClick={() => toggleSuit(s)}
+                      >
+                        {s}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
 
+              {/* properties & abilities */}
               <label className="text-xs opacity-70">Properties</label>
               <textarea
-                className="w-full bg-transparent outline-none resize-none mb-2"
+                className="w-full bg-transparent outline-none resize-none mb-3"
                 rows={2}
                 placeholder="Properties…"
                 value={item.properties}
                 readOnly={!editable}
-                onChange={e => patch({ properties: e.target.value })}
+                onChange={(e) => patch({ properties: e.target.value })}
               />
 
               <label className="text-xs opacity-70">Abilities</label>
@@ -112,68 +143,68 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
                 placeholder="Abilities…"
                 value={item.abilities}
                 readOnly={!editable}
-                onChange={e => patch({ abilities: e.target.value })}
+                onChange={(e) => patch({ abilities: e.target.value })}
               />
             </>
           )}
 
+          {/* WEAPON ------------------------------------------------- */}
           {item.type === 'weapon' && (
             <>
-              {/* skill + range */}
-              {editable ? (
-                <input
-                  className="bg-transparent outline-none mb-1"
-                  placeholder="Associated Skill…"
-                  value={item.skill}
-                  onChange={e => patch({ skill: e.target.value })}
-                />
-              ) : (
-                <p className="text-xs opacity-70 mb-1">{item.skill}</p>
-              )}
-
+              {/* Skill input stays in header; here we show range + properties */}
               {editable && (
                 <select
                   className="bg-black/60 mb-2 px-2 py-1 rounded border border-white/20"
                   value={item.range}
-                  onChange={e => patch({ range: e.target.value })}
+                  onChange={(e) => patch({ range: e.target.value })}
                 >
-                  {WEAPON_RANGES.map(r => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
+                  {WEAPON_RANGES.map((r) => (
+                    <option key={r}>{r}</option>
                   ))}
                 </select>
               )}
               {!editable && <p className="text-xs mb-2">{item.range}</p>}
 
-              {/* Injury block */}
-              <label className="text-xs opacity-70">Injury Name</label>
-              <input
-                className="w-full bg-transparent outline-none mb-1"
-                value={item.injuryName}
+              {/* Properties line */}
+              <label className="text-xs opacity-70">Properties</label>
+              <textarea
+                className="w-full bg-transparent outline-none resize-none mb-3"
+                rows={2}
+                placeholder="Properties…"
+                value={item.properties}
                 readOnly={!editable}
-                placeholder="e.g. Deep Cut"
-                onChange={e => patch({ injuryName: e.target.value })}
+                onChange={(e) => patch({ properties: e.target.value })}
               />
 
-              {['Treatment', 'Effect', 'Cure'].map(f => (
-                <textarea
-                  key={f}
-                  className="w-full bg-transparent outline-none resize-none mb-2"
-                  rows={2}
-                  placeholder={f}
-                  value={item[f.toLowerCase()]}
+              {/* Injury block */}
+              <div className="space-y-2">
+                <input
+                  className="w-full bg-transparent outline-none"
+                  value={item.injuryName}
                   readOnly={!editable}
-                  onChange={e => patch({ [f.toLowerCase()]: e.target.value })}
+                  placeholder="Injury name…"
+                  onChange={(e) => patch({ injuryName: e.target.value })}
                 />
-              ))}
+
+                {['treatment', 'effect', 'cure'].map((f) => (
+                  <textarea
+                    key={f}
+                    className="w-full bg-transparent outline-none resize-none"
+                    rows={2}
+                    placeholder={f.charAt(0).toUpperCase() + f.slice(1)}
+                    value={item[f]}
+                    readOnly={!editable}
+                    onChange={(e) => patch({ [f]: e.target.value })}
+                  />
+                ))}
+              </div>
             </>
           )}
 
-          {/* delete */}
+          {/* delete button */}
           {editable && (
             <button
-              className="text-xs text-red-400 hover:text-red-200"
+              className="mt-4 text-xs text-red-400 hover:text-red-200"
               onClick={onDelete}
             >
               Delete
