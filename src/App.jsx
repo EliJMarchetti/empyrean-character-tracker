@@ -21,16 +21,14 @@ export default function App() {
 
         <div className="flex items-center gap-4">
           {/* global edit‑mode toggle */}
-          <label className="flex items-center gap-2 bg-black/60 px-3 py-2 rounded border border-white/20 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={editable}
-              onChange={e => setEditable(e.target.checked)}
-              className="accent-white"
-            />
-            Edit Character
-          </label>
-
+          <button
+             onClick={() => setEditable(e => !e)}
+              className={`bg-black/60 px-3 py-2 rounded border ${
+              editable ? 'border-white' : 'border-white/20'
+             } transition-colors`}
+        >
+          Edit Character
+          </button>
           {/* character selector placeholder */}
           <select className="bg-black/60 px-3 py-2 rounded border border-white/20">
             <option value="">New / Load…</option>
