@@ -1,4 +1,5 @@
 import AttributeBox from './components/AttributeBox';
+import SkillRow     from './components/SkillRow';
 
 export default function App() {
   return (
@@ -21,7 +22,7 @@ export default function App() {
         </select>
       </header>
 
-      {/* five attribute squares (interactive) */}
+      {/* ── Attribute squares ────────────────────────────── */}
       <section className="grid grid-cols-5 gap-4 p-6">
         {[
           { id: 'might',  label: 'Might'  },
@@ -32,6 +33,48 @@ export default function App() {
         ].map(attr => (
           <AttributeBox key={attr.id} {...attr} />
         ))}
+      </section>
+
+      {/* ── Skills ───────────────────────────────────────── */}
+      <section className="grid grid-cols-3 gap-4 px-6 pb-10">
+        {/* Column 1 */}
+        <div className="bg-black/40">
+          {[
+            { id: 'strength',     label: 'Strength'     },
+            { id: 'celerity',     label: 'Celerity'     },
+            { id: 'coordination', label: 'Coordination' },
+            { id: 'endurance',    label: 'Endurance'    },
+            { id: 'craft',        label: 'Craft'        },
+          ].map(s => (
+            <SkillRow key={s.id} {...s} />
+          ))}
+        </div>
+
+        {/* Column 2 */}
+        <div className="bg-black/40">
+          {[
+            { id: 'reason',      label: 'Reason'      },
+            { id: 'awareness',   label: 'Awareness'   },
+            { id: 'information', label: 'Information' },
+            { id: 'composure',   label: 'Composure'   },
+            { id: 'systems',     label: 'Systems'     },
+          ].map(s => (
+            <SkillRow key={s.id} {...s} />
+          ))}
+        </div>
+
+        {/* Column 3 */}
+        <div className="bg-black/40">
+          {[
+            { id: 'presence',    label: 'Presence'     },
+            { id: 'intuition',   label: 'Intuition'    },
+            { id: 'manipulation',label: 'Manipulation' },
+            { id: 'discipline',  label: 'Discipline'   },
+            { id: 'anima',       label: 'Anima'        },
+          ].map(s => (
+            <SkillRow key={s.id} {...s} />
+          ))}
+        </div>
       </section>
     </div>
   );
