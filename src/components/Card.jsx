@@ -1,19 +1,6 @@
 import { useState } from 'react';
 import SpecSkillRow from './SpecSkillRow';
 
-/**
- * Collapsible card used by Specializations, Talents, Perks.
- *
- * Props
- * ────────────────────────────────────────────────
- * title, body, skill      — strings
- * specSkills              — array [{id,label,mark}]
- * showSkill               — show Skill field (Talents)
- * showSpecSkills          — show nested skills (Specializations)
- * editable                — global Edit‑Character toggle
- * onChange(patch)         — send partial updates upward
- * onDelete()              — optional delete button
- */
 export default function Card({
   title,
   body,
@@ -49,7 +36,7 @@ export default function Card({
 
   return (
     <div className="bg-black/40 border border-white/20 mb-2">
-      {/* ── Header ─────────────────────────────────── */}
+      {/* ── Header (click to toggle) ───────────────────── */}
       <div
         className="flex justify-between items-center px-3 py-2 cursor-pointer select-none"
         onClick={() => setOpen(o => !o)}
@@ -81,7 +68,21 @@ export default function Card({
         <span>{open ? '▾' : '▸'}</span>
       </div>
 
-      {/* ── Body ────────────────────────────────────── */}
+      {/* ── Always‑visible Specialization skills ───────── */}
+      {showSpecSkills && (
+        <div className="px-3 pt-2">
+          {specSkills.map((sk, idx) => (
+            <SpecSkillRow
+              key={sk.id}
+              skill={sk}
+              editable={editable}
+              onChange={patch => updateSpecSkill(idx, patch)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ── Collapsible body (description, add, delete) ─ */}
       {open && (
         <div className="px-3 pb-3">
           {editable ? (
@@ -96,30 +97,15 @@ export default function Card({
             <p className="whitespace-pre-wrap text-sm">{body}</p>
           )}
 
-          {/* nested Specialization Skills */}
-          {showSpecSkills && (
-            <div className="mt-2 border-t border-white/20 pt-2">
-              {specSkills.map((sk, idx) => (
-                <SpecSkillRow
-                  key={sk.id}
-                  skill={sk}
-                  editable={editable}
-                  onChange={patch => updateSpecSkill(idx, patch)}
-                />
-              ))}
-
-              {editable && (
-                <button
-                  className="mt-1 text-xs bg-black/40 px-2 py-1 border border-white/20 hover:border-white"
-                  onClick={addSpecSkill}
-                >
-                  ＋ Add Skill
-                </button>
-              )}
-            </div>
+          {showSpecSkills && editable && (
+            <button
+              className="mt-2 text-xs bg-black/40 px-2 py-1 border border-white/20 hover:border-white"
+              onClick={addSpecSkill}
+            >
+              ＋ Add Skill
+            </button>
           )}
 
-          {/* delete button */}
           {editable && onDelete && (
             <button
               className="mt-3 text-xs text-red-400 hover:text-red-200"
