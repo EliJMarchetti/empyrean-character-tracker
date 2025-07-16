@@ -1,9 +1,22 @@
+
+import AttributeBox from './components/AttributeBox';
+<section className="grid grid-cols-5 gap-4 p-6">
+  {[
+    { id: 'might',  label: 'Might'  },
+    { id: 'reflex', label: 'Reflex' },
+    { id: 'wits',   label: 'Wits'   },
+    { id: 'charm',  label: 'Charm'  },
+    { id: 'spirit', label: 'Spirit' },
+  ].map(attr => (
+    <AttributeBox key={attr.id} {...attr} />
+  ))}
+</section>
 export default function App() {
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* full‑screen background image */}
       <img
-        src="/background.jpeg"          /* <— file lives in /public */
+        src="./background.jpeg"          /* <— file lives in /public */
         alt="Empyrean code‑flare backdrop"
         className="fixed inset-0 w-full h-full object-cover z-[-1]"
       />
