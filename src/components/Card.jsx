@@ -14,10 +14,9 @@ export default function Card({
 }) {
   const [open, setOpen] = useState(false);
 
-  /* helper to update any field */
+  /* helper setters */
   const edit = field => e => onChange({ [field]: e.target.value });
 
-  /* add a blank nested skill */
   const addSpecSkill = () =>
     onChange({
       specSkills: [
@@ -26,7 +25,6 @@ export default function Card({
       ],
     });
 
-  /* update one nested skill */
   const updateSpecSkill = (idx, patch) =>
     onChange({
       specSkills: specSkills.map((s, i) =>
@@ -36,7 +34,7 @@ export default function Card({
 
   return (
     <div className="bg-black/40 border border-white/20 mb-2">
-      {/* ── Header (click to toggle) ───────────────────── */}
+      {/* ── Header (click to toggle) ───────────────────── */}
       <div
         className="flex justify-between items-center px-3 py-2 cursor-pointer select-none"
         onClick={() => setOpen(o => !o)}
@@ -68,23 +66,9 @@ export default function Card({
         <span>{open ? '▾' : '▸'}</span>
       </div>
 
-      {/* ── Always‑visible Specialization skills ───────── */}
-      {showSpecSkills && (
-        <div className="px-3 pt-2">
-          {specSkills.map((sk, idx) => (
-            <SpecSkillRow
-              key={sk.id}
-              skill={sk}
-              editable={editable}
-              onChange={patch => updateSpecSkill(idx, patch)}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* ── Collapsible body (description, add, delete) ─ */}
+      {/* ── Collapsible description (now above skills) ── */}
       {open && (
-        <div className="px-3 pb-3">
+        <div className="px-3">
           {editable ? (
             <textarea
               className="w-full bg-transparent outline-none resize-none"
@@ -97,15 +81,6 @@ export default function Card({
             <p className="whitespace-pre-wrap text-sm">{body}</p>
           )}
 
-          {showSpecSkills && editable && (
-            <button
-              className="mt-2 text-xs bg-black/40 px-2 py-1 border border-white/20 hover:border-white"
-              onClick={addSpecSkill}
-            >
-              ＋ Add Skill
-            </button>
-          )}
-
           {editable && onDelete && (
             <button
               className="mt-3 text-xs text-red-400 hover:text-red-200"
@@ -114,6 +89,30 @@ export default function Card({
               Delete
             </button>
           )}
+
+          {/* Add‑Skill button sits with description when editing */}
+          {showSpecSkills && editable && (
+            <button
+              className="mt-2 text-xs bg-black/40 px-2 py-1 border border-white/20 hover:border-white"
+              onClick={addSpecSkill}
+            >
+              ＋ Add Skill
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── Always‑visible specialization skills (bottom) ─ */}
+      {showSpecSkills && (
+        <div className="px-3 pt-2 pb-3 border-t border-white/20">
+          {specSkills.map((sk, idx) => (
+            <SpecSkillRow
+              key={sk.id}
+              skill={sk}
+              editable={editable}
+              onChange={patch => updateSpecSkill(idx, patch)}
+            />
+          ))}
         </div>
       )}
     </div>
