@@ -90,6 +90,7 @@ export default function App() {
         title="Specializations"
         keyPrefix="specs"
         editable={editable}
+        showSpecSkills={true}
       />
 
       <CardList

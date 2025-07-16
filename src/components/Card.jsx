@@ -1,38 +1,58 @@
 import { useState } from 'react';
+import SpecSkillRow from './SpecSkillRow';
 
 /**
- * Collapsible card.
+ * Collapsible card used by Specializations, Talents, Perks.
+ *
  * Props
- * ─────────────────────────────────────────────
- * id          unique key (not stored here)
- * title       string
- * body        string
- * skill       string  (optional)
- * showSkill   boolean (display Skill input when true)
- * editable    boolean (global Edit‑Character toggle)
- * onChange    fn(patch)  patch = {title?, body?, skill?}
- * onDelete    fn()       optional
+ * ────────────────────────────────────────────────
+ * title, body, skill      — strings
+ * specSkills              — array [{id,label,mark}]
+ * showSkill               — show Skill field (Talents)
+ * showSpecSkills          — show nested skills (Specializations)
+ * editable                — global Edit‑Character toggle
+ * onChange(patch)         — send partial updates upward
+ * onDelete()              — optional delete button
  */
 export default function Card({
   title,
   body,
   skill,
+  specSkills = [],
   showSkill = false,
+  showSpecSkills = false,
   editable,
   onChange,
   onDelete,
 }) {
   const [open, setOpen] = useState(false);
 
-  /* helpers for controlled inputs */
-  const edit = (field) => (e) => onChange({ [field]: e.target.value });
+  /* helper to update any field */
+  const edit = field => e => onChange({ [field]: e.target.value });
+
+  /* add a blank nested skill */
+  const addSpecSkill = () =>
+    onChange({
+      specSkills: [
+        ...specSkills,
+        { id: Date.now(), label: '', mark: '' },
+      ],
+    });
+
+  /* update one nested skill */
+  const updateSpecSkill = (idx, patch) =>
+    onChange({
+      specSkills: specSkills.map((s, i) =>
+        i === idx ? patch : s
+      ),
+    });
 
   return (
     <div className="bg-black/40 border border-white/20 mb-2">
-      {/* header */}
+      {/* ── Header ─────────────────────────────────── */}
       <div
         className="flex justify-between items-center px-3 py-2 cursor-pointer select-none"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => setOpen(o => !o)}
       >
         {editable ? (
           <div className="flex-1 flex gap-1">
@@ -61,7 +81,7 @@ export default function Card({
         <span>{open ? '▾' : '▸'}</span>
       </div>
 
-      {/* body */}
+      {/* ── Body ────────────────────────────────────── */}
       {open && (
         <div className="px-3 pb-3">
           {editable ? (
@@ -76,9 +96,33 @@ export default function Card({
             <p className="whitespace-pre-wrap text-sm">{body}</p>
           )}
 
+          {/* nested Specialization Skills */}
+          {showSpecSkills && (
+            <div className="mt-2 border-t border-white/20 pt-2">
+              {specSkills.map((sk, idx) => (
+                <SpecSkillRow
+                  key={sk.id}
+                  skill={sk}
+                  editable={editable}
+                  onChange={patch => updateSpecSkill(idx, patch)}
+                />
+              ))}
+
+              {editable && (
+                <button
+                  className="mt-1 text-xs bg-black/40 px-2 py-1 border border-white/20 hover:border-white"
+                  onClick={addSpecSkill}
+                >
+                  ＋ Add Skill
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* delete button */}
           {editable && onDelete && (
             <button
-              className="mt-2 text-xs text-red-400 hover:text-red-200"
+              className="mt-3 text-xs text-red-400 hover:text-red-200"
               onClick={onDelete}
             >
               Delete
