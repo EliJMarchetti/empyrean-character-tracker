@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * Reusable attribute square
+ * - Click the large number to cycle 0 → 5 → 0
+ * - Notes field is editable
+ * - Data is kept in localStorage under keys attr:{id}:value / attr:{id}:notes
+ */
 export default function AttributeBox({ id, label }) {
-  // load saved value or default
-  const [value, setValue]   = useState(() => {
-    const saved = localStorage.getItem(`attr:${id}:value`);
-    return saved ? Number(saved) : 0;
+  const [value, setValue] = useState(() => {
+    const stored = localStorage.getItem(`attr:${id}:value`);
+    return stored ? Number(stored) : 0;
   });
-  const [notes, setNotes]   = useState(() => localStorage.getItem(`attr:${id}:notes`) || '');
+  const [notes, setNotes] = useState(
+    () => localStorage.getItem(`attr:${id}:notes`) || ''
+  );
 
-  // save whenever value or notes change
   useEffect(() => {
     localStorage.setItem(`attr:${id}:value`, value);
     localStorage.setItem(`attr:${id}:notes`, notes);
-  }, [value, notes, id]);
-
-  // click cycles 0→5
-  const cycle = () => setValue(v => (v + 1) % 6);
+  }, [id, value, notes]);
 
   return (
     <div className="bg-black/50 aspect-square flex flex-col">
@@ -25,7 +28,7 @@ export default function AttributeBox({ id, label }) {
 
       <button
         className="h-1/2 flex items-center justify-center text-4xl select-none"
-        onClick={cycle}
+        onClick={() => setValue(v => (v + 1) % 6)}
       >
         {value}
       </button>

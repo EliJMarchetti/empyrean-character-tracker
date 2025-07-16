@@ -1,23 +1,12 @@
-
 import AttributeBox from './components/AttributeBox';
-<section className="grid grid-cols-5 gap-4 p-6">
-  {[
-    { id: 'might',  label: 'Might'  },
-    { id: 'reflex', label: 'Reflex' },
-    { id: 'wits',   label: 'Wits'   },
-    { id: 'charm',  label: 'Charm'  },
-    { id: 'spirit', label: 'Spirit' },
-  ].map(attr => (
-    <AttributeBox key={attr.id} {...attr} />
-  ))}
-</section>
+
 export default function App() {
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* full‑screen background image */}
       <img
-        src="./background.jpeg"          /* <— file lives in /public */
-        alt="Empyrean code‑flare backdrop"
+        src="./background.jpeg"
+        alt="Empyrean background"
         className="fixed inset-0 w-full h-full object-cover z-[-1]"
       />
 
@@ -32,20 +21,16 @@ export default function App() {
         </select>
       </header>
 
-      {/* five attribute squares */}
+      {/* five attribute squares (interactive) */}
       <section className="grid grid-cols-5 gap-4 p-6">
-        {['Might', 'Reflex', 'Wits', 'Charm', 'Spirit'].map(label => (
-          <div key={label} className="bg-black/50 aspect-square flex flex-col">
-            <div className="h-1/4 flex items-center justify-center border-b border-white/20">
-              {label}
-            </div>
-            <div className="h-1/2 flex items-center justify-center text-4xl">
-              0
-            </div>
-            <div className="h-1/4 border-t border-white/20 text-xs px-2 py-1 overflow-hidden">
-              notes…
-            </div>
-          </div>
+        {[
+          { id: 'might',  label: 'Might'  },
+          { id: 'reflex', label: 'Reflex' },
+          { id: 'wits',   label: 'Wits'   },
+          { id: 'charm',  label: 'Charm'  },
+          { id: 'spirit', label: 'Spirit' },
+        ].map(attr => (
+          <AttributeBox key={attr.id} {...attr} />
         ))}
       </section>
     </div>
