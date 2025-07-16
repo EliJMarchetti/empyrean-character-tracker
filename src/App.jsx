@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="relative min-h-screen overflow-hidden">
+      {/* full‑screen background image */}
+      <img
+        src="/background.jpeg"          /* <— file lives in /public */
+        alt="Empyrean code‑flare backdrop"
+        className="fixed inset-0 w-full h-full object-cover z-[-1]"
+      />
 
-export default App
+      {/* nav bar */}
+      <header className="flex items-center justify-between px-6 py-4 bg-black/50 backdrop-blur-sm">
+        <h1 className="text-2xl whitespace-nowrap">
+          Character:&nbsp;<span className="font-bold">PENDING</span>
+        </h1>
+        <div className="text-3xl tracking-widest">EMPYREAN</div>
+        <select className="bg-black/60 px-3 py-2 rounded border border-white/20">
+          <option value="">New / Load…</option>
+        </select>
+      </header>
+
+      {/* five attribute squares */}
+      <section className="grid grid-cols-5 gap-4 p-6">
+        {['Might', 'Reflex', 'Wits', 'Charm', 'Spirit'].map(label => (
+          <div key={label} className="bg-black/50 aspect-square flex flex-col">
+            <div className="h-1/4 flex items-center justify-center border-b border-white/20">
+              {label}
+            </div>
+            <div className="h-1/2 flex items-center justify-center text-4xl">
+              0
+            </div>
+            <div className="h-1/4 border-t border-white/20 text-xs px-2 py-1 overflow-hidden">
+              notes…
+            </div>
+          </div>
+        ))}
+      </section>
+    </div>
+  );
+}
