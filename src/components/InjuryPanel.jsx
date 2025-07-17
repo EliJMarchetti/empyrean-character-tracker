@@ -13,10 +13,10 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
     effect: '',
     treatment: '',
     cure: '',
-    treated: false
+    treated: false,
   });
 
-  /* total filled slots */
+  /* filled slots */
   const filled = injuries.reduce((s, i) => s + Number(i.severity), 0);
 
   /* ---------- Death modal ---------- */
@@ -24,7 +24,7 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-40">
         <div className="bg-black/90 text-white border border-white/20 p-6 text-center space-y-4">
-          <h2 className="text-2xl mb-2">You Died</h2>
+          <h2 className="text-2xl mb-2">You Died</h2>
           <button
             className="px-3 py-1 border border-white/40 hover:border-white"
             onClick={() => remove(injuries[injuries.length - 1].id)}
@@ -35,7 +35,7 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
             className="px-3 py-1 border border-red-400 hover:border-red-200"
             onClick={() => localStorage.clear() || location.reload()}
           >
-            Delete Character
+            Delete Character
           </button>
         </div>
       </div>
@@ -56,7 +56,7 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
       effect: '',
       treatment: '',
       cure: '',
-      treated: false
+      treated: false,
     });
     setShowForm(false);
   };
@@ -64,13 +64,12 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
   /* ---------- UI ---------- */
   return (
     <aside className="fixed top-0 right-0 w-1/6 h-screen flex flex-col z-10 fixed-ui-bg bg-left bg-top bg-fixed backdrop-blur-sm border-l border-white/20">
-
       {/* header */}
       <div className="h-16 flex items-center justify-center border-b border-white/20">
         <h2 className="text-lg">Injuries</h2>
       </div>
 
-      {/* grid lines */}
+      {/* slot grid lines */}
       <div className="absolute inset-x-0 top-16 bottom-16 pointer-events-none">
         {[1, 2, 3, 4].map(n => (
           <div
@@ -99,7 +98,7 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
                 className="opacity-60 hover:opacity-100 text-xs"
                 title="Edit"
                 onClick={() => {
-                  setDraft(i);         // load existing injury into form
+                  setDraft(i);
                   setShowForm(true);
                 }}
               >
@@ -107,7 +106,18 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
               </button>
             </div>
 
-            {!i.treated && <p className="mb-1">{i.effect}</p>}
+            {/* Effect always shown until cured */}
+            {!i.treated && i.effect && <p className="mb-1">{i.effect}</p>}
+
+            {/* Treatment line (only before treated) */}
+            {!i.treated && i.treatment && (
+              <p className="mb-1 italic">Treatment: {i.treatment}</p>
+            )}
+
+            {/* Cure line (after treated, before cure) */}
+            {i.treated && i.cure && (
+              <p className="mb-1 italic">Cure: {i.cure}</p>
+            )}
 
             <label className="flex items-center gap-1 mb-1">
               <input
@@ -124,7 +134,7 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
                 disabled={!i.treated}
                 onChange={() => remove(i.id)}
               />
-              Cure applied
+              Cure applied
             </label>
           </div>
         ))}
@@ -142,12 +152,12 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
               effect: '',
               treatment: '',
               cure: '',
-              treated: false
+              treated: false,
             });
             setShowForm(true);
           }}
         >
-          Add Injury
+          Add Injury
         </button>
       </div>
 
@@ -202,7 +212,7 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
               className="w-full bg-black/60 border border-white/40 py-1 hover:border-white"
               onClick={saveDraft}
             >
-              Save Injury
+              Save Injury
             </button>
           </div>
         </div>
