@@ -5,3 +5,11 @@
 @tailwind utilities;
 
 * { @apply text-white font-mono; }
+body { background: #000; }
+[role="img"] { font-family: inherit; } /* future‑proof icon spacing */
+/* Steel texture for header & injury panel */
+.fixed-ui-bg {
+  background-image: url('./foreground.jpeg');
+  background-size: cover;
+  background-position: center;
+}

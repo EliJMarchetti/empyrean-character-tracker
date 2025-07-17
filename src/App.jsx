@@ -12,17 +12,16 @@ export default function App() {
   return (
     <InjuryProvider>
       <div className="flex">
-        {/* ── LEFT 5/6 : main sheet ───────────────────────────────── */}
+        {/* LEFT: main sheet (5/6 width) */}
         <div className="w-5/6 relative min-h-screen overflow-x-hidden">
-          {/* background image */}
           <img
             src="./background.jpeg"
             alt="Empyrean background"
             className="fixed inset-0 w-full h-full object-cover z-[-1]"
           />
 
-          {/* sticky header */}
-          <header className="fixed top-0 left-0 w-5/6 z-10 flex items-center justify-between px-6 py-4 bg-black/50 backdrop-blur-sm">
+          {/* sticky header, now with steel bg */}
+          <header className="fixed top-0 left-0 w-5/6 z-10 flex items-center justify-between px-6 py-4 backdrop-blur-sm fixed-ui-bg">
             <h1 className="text-2xl whitespace-nowrap">
               Character:&nbsp;<span className="font-bold">PENDING</span>
             </h1>
@@ -43,7 +42,7 @@ export default function App() {
             </div>
           </header>
 
-          {/* sheet content (padding top = header height) */}
+          {/* content */}
           <div className="pt-24">
             {/* Attributes */}
             <section className="grid grid-cols-5 gap-4 p-6">
@@ -91,7 +90,7 @@ export default function App() {
               ))}
             </section>
 
-            {/* Specializations / Talents / Perks */}
+            {/* Card lists */}
             <CardList
               title="Specializations"
               keyPrefix="specs"
@@ -117,8 +116,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* ── RIGHT 1/6 : anchored Injury panel ─────────── */}
-        <InjuryPanel editable={editable} />
+        {/* RIGHT: anchored panel (1/6) */}
+        <InjuryPanel />
       </div>
     </InjuryProvider>
   );

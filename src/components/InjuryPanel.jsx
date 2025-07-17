@@ -1,20 +1,19 @@
 import { useState } from 'react';
 import { useInjuries } from '../context/InjuryContext';
 
-/* simple constants */
 const SLOT_MAX = 5;
 
-export default function InjuryPanel({ editable }) {
+export default function InjuryPanel() {
   const { injuries, add, update, remove } = useInjuries();
   const [showForm, setShowForm] = useState(false);
   const [draft, setDraft] = useState({
     name: '', severity: 1, effect: '', treatment: '', cure: '',
   });
 
-  /* how many of the 5 slots are filled? */
+  /* total occupied slots */
   const filled = injuries.reduce((s, i) => s + Number(i.severity), 0);
 
-  /* if >5 we show a “You Died” modal */
+  /* death modal */
   if (filled > SLOT_MAX) {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-40">
@@ -37,7 +36,7 @@ export default function InjuryPanel({ editable }) {
     );
   }
 
-  /* save new injury from the mini form */
+  /* save new injury */
   const saveDraft = () => {
     add({ id: Date.now(), ...draft, treated: false });
     setDraft({ name: '', severity: 1, effect: '', treatment: '', cure: '' });
@@ -45,62 +44,63 @@ export default function InjuryPanel({ editable }) {
   };
 
   return (
-    <aside className="fixed top-0 right-0 w-1/6 h-screen bg-black/60 backdrop-blur-sm border-l border-white/20 flex flex-col z-10">
+    <aside className="fixed top-0 right-0 w-1/6 h-screen border-l border-white/20 flex flex-col z-10 fixed-ui-bg backdrop-blur-sm">
 
-      <h2 className="text-center py-2 border-b border-white/20">Injuries</h2>
+      {/* header */}
+      <div className="flex items-center justify-between px-3 py-2 border-b border-white/20">
+        <h2>Injuries</h2>
+      </div>
 
-      {/* list */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-2">
+      {/* five equal slots container */}
+      <div className="flex-1 flex flex-col justify-start overflow-hidden">
         {injuries.map(i => (
           <div
             key={i.id}
+            style={{ height: `calc(100% / 5 * ${i.severity})` }}
             className={`border ${
-              i.treated ? 'border-gray-400 bg-gray-800' : 'border-red-400'
-            } p-1 text-xs space-y-1`}
+              i.treated ? 'border-gray-400 bg-gray-800' : 'border-red-400 bg-black/40'
+            } p-1 text-xs space-y-1 overflow-y-auto`}
           >
-            <div className="flex justify-between">
-              <span>{i.name} <span className="opacity-60">S{i.severity}</span></span>
-              {editable && (
-                <button onClick={() => remove(i.id)} className="opacity-60">✕</button>
-              )}
-            </div>
-
+            <span>{i.name}</span>
             {!i.treated && <p>{i.effect}</p>}
 
-            {editable && (
-              <label className="flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  checked={i.treated}
-                  onChange={e => update(i.id, { treated: e.target.checked })}
-                />
-                Treated
-              </label>
-            )}
+            {/* Treated checkbox */}
+            <label className="flex items-center gap-1">
+              <input
+                type="checkbox"
+                checked={i.treated}
+                onChange={e => update(i.id, { treated: e.target.checked })}
+              />
+              Treated
+            </label>
 
-            {i.treated && (
-              <label className="flex items-center gap-1">
-                <input type="checkbox" onChange={() => remove(i.id)} />
-                Cure applied
-              </label>
-            )}
+            {/* Cure checkbox (enabled only when treated) */}
+            <label className="flex items-center gap-1 opacity-70">
+              <input
+                type="checkbox"
+                disabled={!i.treated}
+                onChange={() => remove(i.id)}
+              />
+              Cure applied
+            </label>
           </div>
         ))}
       </div>
 
-      {/* floating heart to open form */}
-      {editable && (
-        <button
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 text-2xl"
-          onClick={() => setShowForm(true)}
-        >
-          ❤️
-        </button>
-      )}
+      {/* footer divider */}
+      <div className="border-t border-white/20"></div>
 
-      {/* simple add‑injury form */}
-      {showForm && editable && (
-        <div className="absolute inset-0 bg-black/90 p-4 space-y-2">
+      {/* Add Injury button */}
+      <button
+        className="w-full bg-black/60 py-2 border-t border-white/20 hover:bg-black/70"
+        onClick={() => setShowForm(true)}
+      >
+        Add Injury
+      </button>
+
+      {/* add‑injury form */}
+      {showForm && (
+        <div className="absolute inset-0 bg-black/90 p-4 space-y-2 overflow-y-auto">
           <input
             className="w-full bg-transparent outline-none"
             placeholder="Name…"
@@ -112,7 +112,9 @@ export default function InjuryPanel({ editable }) {
             value={draft.severity}
             onChange={e => setDraft({ ...draft, severity: Number(e.target.value) })}
           >
-            {[1,2,3,4,5].map(n => <option key={n}>Severity {n}</option>)}
+            {[1,2,3,4,5].map(n => (
+              <option key={n} value={n}>{n}</option>
+            ))}
           </select>
           <textarea
             className="w-full bg-transparent outline-none resize-none" rows={2}
