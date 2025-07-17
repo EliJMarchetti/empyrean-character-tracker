@@ -1,17 +1,16 @@
-/* Tailwind directives — keep them at the top */
+/* Tailwind base */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ─────────────────────────────────────────────
-   Steel texture + subtle dark overlay
-   Used by sticky header and Injury panel
+   Steel texture + dark overlay + white text
 ────────────────────────────────────────────── */
 .fixed-ui-bg {
-  background-image: url('./foreground.jpeg');
+  background-image: url('/foreground.jpeg'); /*   <— note leading slash   */
   background-size: cover;
   background-position: center;
-  /* dark overlay so white text remains readable */
-  background-color: rgba(0, 0, 0, 0.55);
+  background-color: rgba(0, 0, 0, 0.55);     /* darken so text pops    */
   background-blend-mode: multiply;
+  @apply text-white;                         /* keep all text white    */
 }

@@ -7,11 +7,7 @@ export default function InjuryPanel() {
   const { injuries, add, update, remove } = useInjuries();
   const [showForm, setShowForm] = useState(false);
   const [draft, setDraft] = useState({
-    name: '',
-    severity: 1,
-    effect: '',
-    treatment: '',
-    cure: '',
+    name: '', severity: 1, effect: '', treatment: '', cure: '',
   });
 
   /* total filled slots */
@@ -23,14 +19,12 @@ export default function InjuryPanel() {
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-40">
         <div className="bg-black/90 border border-white/20 p-6 text-center space-y-4">
           <h2 className="text-2xl mb-2">You Died</h2>
-
           <button
             className="px-3 py-1 border border-white/40 hover:border-white"
             onClick={() => remove(injuries[injuries.length - 1].id)}
           >
             Return
           </button>
-
           <button
             className="px-3 py-1 border border-red-400 hover:border-red-200"
             onClick={() => localStorage.clear() || location.reload()}
@@ -52,39 +46,36 @@ export default function InjuryPanel() {
   return (
     <aside className="fixed top-0 right-0 w-1/6 h-screen border-l border-white/20 flex flex-col z-10 fixed-ui-bg backdrop-blur-sm">
 
-      {/* header (same height as page header) */}
-      <div className="flex items-center justify-between px-3 py-4 border-b border-white/20">
-        <h2>Injuries</h2>
+      {/* header matches main header height (h‑16 = 64 px) */}
+      <div className="h-16 flex items-center px-6 border-b border-white/20">
+        <h2 className="text-lg">Injuries</h2>
       </div>
 
-      {/* horizontal grid lines (4) for 5 equal slots */}
+      {/* 4 faint lines create 5 equal slots */}
       <div className="absolute inset-0 pointer-events-none">
-        {[1, 2, 3, 4].map(n => (
+        {[1,2,3,4].map(n => (
           <div
             key={n}
             className="absolute left-0 right-0 border-t border-white/20"
-            style={{ top: `${(100 / 5) * n}%` }}
+            style={{ top: `${(100/5)*n}%` }}
           />
         ))}
       </div>
 
-      {/* scrolling list (flex column) */}
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      {/* list area */}
+      <div className="flex-1 overflow-y-auto">
         {injuries.map(i => (
           <div
             key={i.id}
             style={{ height: `calc(100% / 5 * ${i.severity})` }}
-            className={`border p-1 text-xs space-y-1 overflow-y-auto ${
-              i.treated
-                ? 'border-gray-400 bg-gray-800'
-                : 'border-red-400 bg-black/40'
-            }`}
+            className={`p-2 text-xs overflow-y-auto ${
+              i.treated ? 'bg-gray-800 border-gray-400' : 'bg-black/40 border-red-400'
+            } border`}
           >
-            <span>{i.name}</span>
-            {!i.treated && <p>{i.effect}</p>}
+            <span className="block mb-1">{i.name}</span>
+            {!i.treated && <p className="mb-1">{i.effect}</p>}
 
-            {/* Treated checkbox */}
-            <label className="flex items-center gap-1">
+            <label className="flex items-center gap-1 mb-1">
               <input
                 type="checkbox"
                 checked={i.treated}
@@ -93,8 +84,7 @@ export default function InjuryPanel() {
               Treated
             </label>
 
-            {/* Cure checkbox: disabled until Treated */}
-            <label className="flex items-center gap-1 opacity-70">
+            <label className="flex items-center gap-1 opacity-80">
               <input
                 type="checkbox"
                 disabled={!i.treated}
@@ -106,16 +96,15 @@ export default function InjuryPanel() {
         ))}
       </div>
 
-      {/* footer divider */}
-      <div className="border-t border-white/20"></div>
-
-      {/* Add Injury button (always active) */}
-      <button
-        className="w-full bg-black/60 py-2 border-t border-white/20 hover:bg-black/70"
-        onClick={() => setShowForm(true)}
-      >
-        Add Injury
-      </button>
+      {/* footer divider to mirror header height gap */}
+      <div className="h-16 border-t border-white/20 flex items-center justify-center">
+        <button
+          className="bg-black/60 px-4 py-1 border border-white/30 hover:border-white"
+          onClick={() => setShowForm(true)}
+        >
+          Add Injury
+        </button>
+      </div>
 
       {/* pop‑up form */}
       {showForm && (
@@ -132,9 +121,7 @@ export default function InjuryPanel() {
             value={draft.severity}
             onChange={e => setDraft({ ...draft, severity: Number(e.target.value) })}
           >
-            {[1, 2, 3, 4, 5].map(n => (
-              <option key={n} value={n}>{n}</option>
-            ))}
+            {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
           </select>
 
           <textarea
