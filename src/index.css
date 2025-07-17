@@ -1,15 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
+/* Tailwind directives — keep them at the top */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* { @apply text-white font-mono; }
-body { background: #000; }
-[role="img"] { font-family: inherit; } /* future‑proof icon spacing */
-/* Steel texture for header & injury panel */
+/* ─────────────────────────────────────────────
+   Steel texture + subtle dark overlay
+   Used by sticky header and Injury panel
+────────────────────────────────────────────── */
 .fixed-ui-bg {
   background-image: url('./foreground.jpeg');
   background-size: cover;
   background-position: center;
+  /* dark overlay so white text remains readable */
+  background-color: rgba(0, 0, 0, 0.55);
+  background-blend-mode: multiply;
 }
