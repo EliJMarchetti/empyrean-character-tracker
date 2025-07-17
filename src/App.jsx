@@ -3,16 +3,60 @@ import AttributeBox   from './components/AttributeBox';
 import SkillRow       from './components/SkillRow';
 import CardList       from './components/CardList';
 import InventoryList  from './components/InventoryList';
-import InjuryProvider from './context/InjuryContext';
 import InjuryPanel    from './components/InjuryPanel';
+
+import CharacterProvider, { useCharacter } from './context/CharacterContext';
+import InjuryProvider    from './context/InjuryContext';
+
+/* helper to show the dropdown */
+function CharacterSelect() {
+  const { names, current, setCurrent, create } = useCharacter();
+
+  const handle = e => {
+    if (e.target.value === '__new') {
+      const name = prompt('New character name?');
+      if (name && !names.includes(name)) create(name);
+    } else {
+      setCurrent(e.target.value);
+    }
+  };
+
+  return (
+    <select
+      className="bg-black/60 px-3 py-2 rounded border border-white/20"
+      value={current}
+      onChange={handle}
+    >
+      {names.map(n => (
+        <option key={n} value={n}>{n}</option>
+      ))}
+      <option value="__new">＋ New Character…</option>
+    </select>
+  );
+}
+
+/* slug helper */
+const slug = str => str.trim().replace(/\s+/g, '_');
 
 export default function App() {
   const [editable, setEditable] = useState(false);
 
   return (
-    <InjuryProvider>
+    <CharacterProvider>
+      <InnerApp editable={editable} setEditable={setEditable} />
+    </CharacterProvider>
+  );
+}
+
+/* everything you already had, but reads current character */
+function InnerApp({ editable, setEditable }) {
+  const { current } = useCharacter();
+  const pre = slug(current) + '-';       // "Alice-" etc.
+
+  return (
+    <InjuryProvider prefix={`${pre}injuries`}>
       <div className="flex">
-        {/* LEFT: main sheet (5/6 width) */}
+        {/* LEFT column */}
         <div className="w-5/6 relative min-h-screen overflow-x-hidden">
           <img
             src="./background.jpeg"
@@ -20,10 +64,10 @@ export default function App() {
             className="fixed inset-0 w-full h-full object-cover z-[-1]"
           />
 
-          {/* sticky header, now with steel bg */}
+          {/* header */}
           <header className="fixed top-0 left-0 w-5/6 h-16 z-10 flex items-center justify-between px-6 backdrop-blur-sm fixed-ui-bg bg-left bg-top bg-fixed">
             <h1 className="text-2xl whitespace-nowrap">
-              Character:&nbsp;<span className="font-bold">PENDING</span>
+              Character: <span className="font-bold">{current}</span>
             </h1>
 
             <div className="flex items-center gap-4">
@@ -36,13 +80,11 @@ export default function App() {
                 Edit Character
               </button>
 
-              <select className="bg-black/60 px-3 py-2 rounded border border-white/20">
-                <option value="">New / Load…</option>
-              </select>
+              <CharacterSelect />
             </div>
           </header>
 
-          {/* content */}
+          {/* sheet */}
           <div className="pt-24">
             {/* Attributes */}
             <section className="grid grid-cols-5 gap-4 p-6">
@@ -90,34 +132,34 @@ export default function App() {
               ))}
             </section>
 
-            {/* Card lists */}
+            {/* Specializations / Talents / Perks */}
             <CardList
               title="Specializations"
-              keyPrefix="specs"
+              keyPrefix={`${pre}specs`}
               editable={editable}
               showSpecSkills={true}
             />
 
             <CardList
               title="Talents"
-              keyPrefix="talents"
+              keyPrefix={`${pre}talents`}
               editable={editable}
               showSkill={true}
             />
 
             <CardList
               title="Perks"
-              keyPrefix="perks"
+              keyPrefix={`${pre}perks`}
               editable={editable}
             />
 
             {/* Inventory */}
-            <InventoryList editable={editable} />
+            <InventoryList editable={editable} storageKey={`${pre}inventory`} />
           </div>
         </div>
 
-        {/* RIGHT: anchored panel (1/6) */}
-        <InjuryPanel />
+        {/* RIGHT column */}
+        <InjuryPanel prefix={`${pre}injuries`} />
       </div>
     </InjuryProvider>
   );

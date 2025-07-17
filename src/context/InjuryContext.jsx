@@ -1,26 +1,27 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-/* give every component easy access to injuries */
+/* easy access */
 const InjuryCtx = createContext();
 export const useInjuries = () => useContext(InjuryCtx);
 
-export default function InjuryProvider({ children }) {
-  /* load from localStorage once */
+/* prefix lets each character have its own injury list */
+export default function InjuryProvider({ children, prefix = 'injuries' }) {
+  /* load once */
   const [injuries, setInjuries] = useState(() => {
-    const raw = localStorage.getItem('injuries');
+    const raw = localStorage.getItem(prefix);
     return raw ? JSON.parse(raw) : [];
   });
 
-  /* save whenever injuries change */
+  /* save on every change */
   useEffect(() => {
-    localStorage.setItem('injuries', JSON.stringify(injuries));
-  }, [injuries]);
+    localStorage.setItem(prefix, JSON.stringify(injuries));
+  }, [injuries, prefix]);
 
-  /* handy functions */
-  const add    = (i)           => setInjuries([...injuries, i]);
-  const update = (id, patch)   =>
-      setInjuries(injuries.map(i => (i.id === id ? { ...i, ...patch } : i)));
-  const remove = (id)          => setInjuries(injuries.filter(i => i.id !== id));
+  /* helpers */
+  const add    = i          => setInjuries([...injuries, i]);
+  const update = (id, p)    =>
+      setInjuries(injuries.map(it => (it.id === id ? { ...it, ...p } : it)));
+  const remove = id         => setInjuries(injuries.filter(it => it.id !== id));
 
   return (
     <InjuryCtx.Provider value={{ injuries, add, update, remove }}>

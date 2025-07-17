@@ -17,20 +17,20 @@ const DEFAULT_ITEM = type => ({
   cure: '',
 });
 
-export default function InventoryList({ editable }) {
+export default function InventoryList({ editable, storageKey = 'inventory' }) {
   const [items, setItems] = useState(() => {
-    const raw = localStorage.getItem('inventory');
+    const raw = localStorage.getItem(storageKey);
     return raw ? JSON.parse(raw) : [];
   });
 
   useEffect(() => {
-    localStorage.setItem('inventory', JSON.stringify(items));
-  }, [items]);
+    localStorage.setItem(storageKey, JSON.stringify(items));
+  }, [items, storageKey]);
 
-  const add = type => setItems([...items, DEFAULT_ITEM(type)]);
+  const add    = type      => setItems([...items, DEFAULT_ITEM(type)]);
   const update = (id, patch) =>
-    setItems(items.map(it => (it.id === id ? patch : it)));
-  const del = id => setItems(items.filter(it => it.id !== id));
+      setItems(items.map(it => (it.id === id ? patch : it)));
+  const del    = id        => setItems(items.filter(it => it.id !== id));
 
   return (
     <section className="px-6 pb-10">
