@@ -154,7 +154,9 @@ function InnerApp({ editable, setEditable }) {
             />
 
             {/* Inventory */}
-            <InventoryList editable={editable} storageKey={`${pre}inventory`} />
+            <InventoryList editable={editable} storageKey={`${pre}inventory`} mode="inventory" />
+            {/* Augments */}
+            <InventoryList editable={editable} storageKey={`${pre}augments`} mode="augment" />
           </div>
         </div>
 

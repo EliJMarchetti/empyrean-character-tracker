@@ -9,6 +9,8 @@
 html {
   font-family: 'Source Code Pro', 'Courier New', monospace;
 }
+/* white placeholder text everywhere */
+::placeholder { color: #ffffff; opacity: 0.6; }
 
 /* ─── Steel texture + dark overlay ─── */
 .fixed-ui-bg {

@@ -1,42 +1,44 @@
 import { useState } from 'react';
 
-const SUITS = ['♥', '♣', '♦', '♠'];
+const SUITS = [
+  { icon: '♥', word: 'Toughness' },
+  { icon: '♣', word: 'Interposition' },
+  { icon: '♦', word: 'Armor' },
+  { icon: '♠', word: 'Counterattack' },
+];
+
 const WEAPON_RANGES = ['Melee', 'Ranged', 'Long Ranged'];
 const MARKS = ['', '+', '++', '–', '––'];
 
-/* helper for suit colors */
-const suitClass = (s, active) => {
+/* helper: suit color class */
+const suitClass = (icon, active) => {
   if (!active) return 'opacity-20';
-  if (s === '♥' || s === '♦') return 'text-red-500';
-  return 'text-black';                 // ♣ or ♠ active
+  return icon === '♥' || icon === '♦' ? 'text-red-500' : 'text-black';
 };
 
 export default function InventoryCard({ item, editable, onChange, onDelete }) {
   const [open, setOpen] = useState(false);
   const patch = p => onChange({ ...item, ...p });
 
-  /* Gear suit toggle */
-  const toggleSuit = s =>
-    patch({
-      suits: item.suits.includes(s)
-        ? item.suits.filter(x => x !== s)
-        : [...item.suits, s],
-    });
+  /* ---- helpers --------------------------------------------------- */
+  const toggleSuit = icon =>
+    patch({ suit: item.suit === icon ? '' : icon });
 
-  /* Weapon skill‑mark cycle */
   const nextMark = () =>
     patch({
       skillMark: MARKS[(MARKS.indexOf(item.skillMark || '') + 1) % MARKS.length],
     });
 
+  /* --------------------------------------------------------------- */
   return (
     <div className="bg-black/40 border border-white/20 mb-2">
-      {/* header */}
+      {/* ------------ header --------------------------------------- */}
       <div
         className="flex items-center justify-between px-3 py-2 cursor-pointer select-none"
         onClick={() => setOpen(o => !o)}
       >
         <div className="flex items-center gap-2">
+          {/* title */}
           {editable ? (
             <input
               className="bg-transparent outline-none"
@@ -48,35 +50,17 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
             <span>{item.title || <em className="opacity-50">Untitled</em>}</span>
           )}
 
-          {/* Gear suits */}
-          {item.type === 'gear' && (
-            <span>
-              {SUITS.map(s => {
-                const active = item.suits.includes(s);
-                return (
-                  <span
-                    key={s}
-                    className={`mx-0.5 ${suitClass(s, active)}`}
-                  >
-                    {s}
-                  </span>
-                );
-              })}
+          {/* Gear suit display */}
+          {item.type === 'gear' && item.suit && (
+            <span className="ml-1">
+              {item.suit}{' '}
+              {SUITS.find(s => s.icon === item.suit)?.word}
             </span>
           )}
 
-          {/* Weapon skill + mark */}
-          {item.type === 'weapon' && (
-            <span
-              className={`text-xs flex items-center gap-1 ${
-                editable ? 'cursor-pointer' : ''
-              }`}
-              title="Cycle mark"
-              onClick={e => {
-                e.stopPropagation();      // prevent collapsing
-                if (editable) nextMark();
-              }}
-            >
+          {/* Weapon skill + mark – only when NOT editing */}
+          {item.type === 'weapon' && !editable && (
+            <span className="text-xs ml-1">
               ({item.skill || <em className="opacity-50">Skill</em>}
               {item.skillMark && ` ${item.skillMark}`})
             </span>
@@ -86,10 +70,10 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
         <span>{open ? '▾' : '▸'}</span>
       </div>
 
-      {/* body */}
+      {/* ------------ body ----------------------------------------- */}
       {open && (
         <div className="px-3 pb-3">
-          {/* ITEM */}
+          {/* ITEM --------------------------------------------------- */}
           {item.type === 'item' && (
             <textarea
               className="w-full bg-transparent outline-none resize-none"
@@ -101,24 +85,21 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
             />
           )}
 
-          {/* GEAR */}
+          {/* GEAR --------------------------------------------------- */}
           {item.type === 'gear' && (
             <>
               {/* suit picker */}
               {editable && (
-                <div className="mb-2">
-                  {SUITS.map(s => {
-                    const active = item.suits.includes(s);
-                    return (
-                      <button
-                        key={s}
-                        className={`mx-0.5 ${suitClass(s, active)}`}
-                        onClick={() => toggleSuit(s)}
-                      >
-                        {s}
-                      </button>
-                    );
-                  })}
+                <div className="mb-2 flex gap-1">
+                  {SUITS.map(s => (
+                    <button
+                      key={s.icon}
+                      className={`px-2 ${suitClass(s.icon, item.suit === s.icon)}`}
+                      onClick={() => toggleSuit(s.icon)}
+                    >
+                      {s.icon}
+                    </button>
+                  ))}
                 </div>
               )}
 
@@ -144,10 +125,10 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
             </>
           )}
 
-          {/* WEAPON */}
+          {/* WEAPON ------------------------------------------------- */}
           {item.type === 'weapon' && (
             <>
-              {/* Range selector */}
+              {/* range selector */}
               {editable ? (
                 <select
                   className="bg-black/60 mb-2 px-2 py-1 rounded border border-white/20"
@@ -162,7 +143,25 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
                 <p className="text-xs mb-2">{item.range}</p>
               )}
 
-              {/* Properties */}
+              {/* skill + mark editor (only visible while editing) */}
+              {editable && (
+                <div className="flex gap-2 mb-2">
+                  <input
+                    className="flex-1 bg-transparent outline-none border-b border-white/30"
+                    placeholder="Skill…"
+                    value={item.skill}
+                    onChange={e => patch({ skill: e.target.value })}
+                  />
+                  <button
+                    className="px-2 border border-white/30"
+                    onClick={nextMark}
+                  >
+                    {item.skillMark || '±'}
+                  </button>
+                </div>
+              )}
+
+              {/* properties */}
               <label className="text-xs opacity-70">Properties</label>
               <textarea
                 className="w-full bg-transparent outline-none resize-none mb-3"
@@ -173,7 +172,7 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
                 onChange={e => patch({ properties: e.target.value })}
               />
 
-              {/* Injury block: Effect → Treatment → Cure */}
+              {/* Injury block */}
               <div className="space-y-2">
                 <input
                   className="w-full bg-transparent outline-none"
@@ -198,6 +197,7 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
             </>
           )}
 
+          {/* delete */}
           {editable && (
             <button
               className="mt-4 text-xs text-red-400 hover:text-red-200"

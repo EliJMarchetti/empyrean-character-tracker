@@ -7,13 +7,19 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
   const { injuries, add, update, remove } = useInjuries(storageKey);
   const [showForm, setShowForm] = useState(false);
   const [draft, setDraft] = useState({
-    name: '', severity: 1, effect: '', treatment: '', cure: '',
+    id: null,
+    name: '',
+    severity: 1,
+    effect: '',
+    treatment: '',
+    cure: '',
+    treated: false
   });
 
   /* total filled slots */
   const filled = injuries.reduce((s, i) => s + Number(i.severity), 0);
 
-  /* ── Death modal ───────────────────────────── */
+  /* ---------- Death modal ---------- */
   if (filled > SLOT_MAX) {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-40">
@@ -36,24 +42,37 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
     );
   }
 
-  /* save new injury */
+  /* ---------- save (add or update) ---------- */
   const saveDraft = () => {
-    add({ id: Date.now(), ...draft, treated: false });
-    setDraft({ name: '', severity: 1, effect: '', treatment: '', cure: '' });
+    if (draft.id) {
+      update(draft.id, draft);
+    } else {
+      add({ id: Date.now(), ...draft });
+    }
+    setDraft({
+      id: null,
+      name: '',
+      severity: 1,
+      effect: '',
+      treatment: '',
+      cure: '',
+      treated: false
+    });
     setShowForm(false);
   };
 
+  /* ---------- UI ---------- */
   return (
     <aside className="fixed top-0 right-0 w-1/6 h-screen flex flex-col z-10 fixed-ui-bg bg-left bg-top bg-fixed backdrop-blur-sm border-l border-white/20">
 
-      {/* header (64 px tall, centred) */}
+      {/* header */}
       <div className="h-16 flex items-center justify-center border-b border-white/20">
         <h2 className="text-lg">Injuries</h2>
       </div>
 
-      {/* 4 faint grid lines (5 equal slots) */}
+      {/* grid lines */}
       <div className="absolute inset-x-0 top-16 bottom-16 pointer-events-none">
-        {[1,2,3,4].map(n => (
+        {[1, 2, 3, 4].map(n => (
           <div
             key={n}
             className="absolute left-0 right-0 border-t border-white/20"
@@ -62,17 +81,32 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
         ))}
       </div>
 
-      {/* list area */}
+      {/* list */}
       <div className="flex-1 overflow-y-auto">
         {injuries.map(i => (
           <div
             key={i.id}
             className={`p-2 text-xs overflow-y-auto border ${
-              i.treated ? 'bg-gray-800 border-gray-400' : 'bg-black/40 border-red-400'
+              i.treated
+                ? 'bg-gray-800 border-gray-400'
+                : 'bg-black/40 border-red-400'
             }`}
             style={{ height: `calc(100% / 5 * ${i.severity})` }}
           >
-            <span className="block mb-1">{i.name}</span>
+            <div className="flex justify-between items-start mb-1">
+              <span>{i.name}</span>
+              <button
+                className="opacity-60 hover:opacity-100 text-xs"
+                title="Edit"
+                onClick={() => {
+                  setDraft(i);         // load existing injury into form
+                  setShowForm(true);
+                }}
+              >
+                ✎
+              </button>
+            </div>
+
             {!i.treated && <p className="mb-1">{i.effect}</p>}
 
             <label className="flex items-center gap-1 mb-1">
@@ -96,17 +130,28 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
         ))}
       </div>
 
-      {/* footer (mirrors header height) */}
+      {/* footer */}
       <div className="h-16 border-t border-white/20 flex items-center justify-center">
         <button
           className="bg-black/60 px-4 py-1 border border-white/30 hover:border-white"
-          onClick={() => setShowForm(true)}
+          onClick={() => {
+            setDraft({
+              id: null,
+              name: '',
+              severity: 1,
+              effect: '',
+              treatment: '',
+              cure: '',
+              treated: false
+            });
+            setShowForm(true);
+          }}
         >
           Add Injury
         </button>
       </div>
 
-      {/* centered Add‑Injury dialog */}
+      {/* modal form */}
       {showForm && (
         <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-20">
           <div className="w-5/6 max-w-md bg-black/90 p-4 space-y-2 overflow-y-auto border border-white/20">
@@ -120,25 +165,34 @@ export default function InjuryPanel({ storageKey = 'injuries' }) {
             <select
               className="w-full bg-black/60"
               value={draft.severity}
-              onChange={e => setDraft({ ...draft, severity: Number(e.target.value) })}
+              onChange={e =>
+                setDraft({ ...draft, severity: Number(e.target.value) })
+              }
             >
-              {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
+              {[1, 2, 3, 4, 5].map(n => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
             </select>
 
             <textarea
-              className="w-full bg-transparent outline-none resize-none" rows={2}
+              className="w-full bg-transparent outline-none resize-none"
+              rows={2}
               placeholder="Effect…"
               value={draft.effect}
               onChange={e => setDraft({ ...draft, effect: e.target.value })}
             />
             <textarea
-              className="w-full bg-transparent outline-none resize-none" rows={2}
+              className="w-full bg-transparent outline-none resize-none"
+              rows={2}
               placeholder="Treatment…"
               value={draft.treatment}
               onChange={e => setDraft({ ...draft, treatment: e.target.value })}
             />
             <textarea
-              className="w-full bg-transparent outline-none resize-none" rows={2}
+              className="w-full bg-transparent outline-none resize-none"
+              rows={2}
               placeholder="Cure…"
               value={draft.cure}
               onChange={e => setDraft({ ...draft, cure: e.target.value })}
