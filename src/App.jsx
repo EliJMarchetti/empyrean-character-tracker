@@ -21,7 +21,7 @@ export default function App() {
           />
 
           {/* sticky header, now with steel bg */}
-          <header className="fixed top-0 left-0 w-5/6 z-10 flex items-center justify-between px-6 py-4 backdrop-blur-sm fixed-ui-bg">
+          <header className="fixed top-0 left-0 w-5/6 h-16 z-10 flex items-center justify-between px-6 backdrop-blur-sm fixed-ui-bg bg-left bg-top bg-fixed">
             <h1 className="text-2xl whitespace-nowrap">
               Character:&nbsp;<span className="font-bold">PENDING</span>
             </h1>

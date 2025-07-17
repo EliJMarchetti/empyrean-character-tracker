@@ -69,7 +69,7 @@ export default function InjuryPanel() {
             className={`p-2 text-xs overflow-y-auto ${
               i.treated ? 'bg-gray-800 border-gray-400' : 'bg-black/40 border-red-400'
             } border`}
-            style={{ height: `calc((100% - ${HEADER_H}px - ${HEADER_H}px) / 5 * ${i.severity})` }}
+            style={{ height: `calc(100% / 5 * ${i.severity})` }}
           >
             <span className="block mb-1">{i.name}</span>
             {!i.treated && <p className="mb-1">{i.effect}</p>}
@@ -107,7 +107,7 @@ export default function InjuryPanel() {
 
       {/* pop-up form */}
       {showForm && (
-        <div className="absolute inset-0 bg-black/90 p-4 space-y-2 overflow-y-auto">
+        <div className="h-16 flex items-center justify-center border-b border-white/20 fixed-ui-bg bg-left bg-top bg-fixed">
           <input
             className="w-full bg-transparent outline-none"
             placeholder="Name…"
