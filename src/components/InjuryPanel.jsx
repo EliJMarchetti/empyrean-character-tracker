@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useInjuries } from '../context/InjuryContext';
 
 const SLOT_MAX = 5;
+const HEADER_H = 64;   // px (matches main header)
 
 export default function InjuryPanel() {
   const { injuries, add, update, remove } = useInjuries();
@@ -18,7 +19,7 @@ export default function InjuryPanel() {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-40">
         <div className="bg-black/90 border border-white/20 p-6 text-center space-y-4">
-          <h2 className="text-2xl mb-2">You Died</h2>
+          <h2 className="text-2xl">You Died</h2>
           <button
             className="px-3 py-1 border border-white/40 hover:border-white"
             onClick={() => remove(injuries[injuries.length - 1].id)}
@@ -29,14 +30,14 @@ export default function InjuryPanel() {
             className="px-3 py-1 border border-red-400 hover:border-red-200"
             onClick={() => localStorage.clear() || location.reload()}
           >
-            Delete Character
+            Delete Character
           </button>
         </div>
       </div>
     );
   }
 
-  /* save a new injury */
+  /* ---------- add new injury ---------- */
   const saveDraft = () => {
     add({ id: Date.now(), ...draft, treated: false });
     setDraft({ name: '', severity: 1, effect: '', treatment: '', cure: '' });
@@ -44,33 +45,31 @@ export default function InjuryPanel() {
   };
 
   return (
-    <aside className="fixed top-0 right-0 w-1/6 h-screen border-l border-white/20 flex flex-col z-10 fixed-ui-bg backdrop-blur-sm">
+    <aside className="fixed top-0 right-0 w-1/6 h-screen flex flex-col z-10 fixed-ui-bg backdrop-blur-sm border-l border-white/20">
 
-      {/* header matches main header height (h‑16 = 64 px) */}
-      <div className="h-16 flex items-center px-6 border-b border-white/20">
+      {/* header (64 px tall like main header) */}
+      <div className="h-16 flex items-center justify-center border-b border-white/20">
         <h2 className="text-lg">Injuries</h2>
       </div>
 
-      {/* 4 faint lines create 5 equal slots */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* list area with slot overlay */}
+      <div className="relative flex-1 overflow-y-auto">
+        {/* 4 lines = 5 equal slots (start below header) */}
         {[1,2,3,4].map(n => (
           <div
             key={n}
             className="absolute left-0 right-0 border-t border-white/20"
-            style={{ top: `${(100/5)*n}%` }}
+            style={{ top: `calc(${n} * (100% / 5))` }}
           />
         ))}
-      </div>
 
-      {/* list area */}
-      <div className="flex-1 overflow-y-auto">
         {injuries.map(i => (
           <div
             key={i.id}
-            style={{ height: `calc(100% / 5 * ${i.severity})` }}
             className={`p-2 text-xs overflow-y-auto ${
               i.treated ? 'bg-gray-800 border-gray-400' : 'bg-black/40 border-red-400'
             } border`}
+            style={{ height: `calc((100% - ${HEADER_H}px - ${HEADER_H}px) / 5 * ${i.severity})` }}
           >
             <span className="block mb-1">{i.name}</span>
             {!i.treated && <p className="mb-1">{i.effect}</p>}
@@ -90,23 +89,23 @@ export default function InjuryPanel() {
                 disabled={!i.treated}
                 onChange={() => remove(i.id)}
               />
-              Cure applied
+              Cure applied
             </label>
           </div>
         ))}
       </div>
 
-      {/* footer divider to mirror header height gap */}
+      {/* footer mirrors header height */}
       <div className="h-16 border-t border-white/20 flex items-center justify-center">
         <button
           className="bg-black/60 px-4 py-1 border border-white/30 hover:border-white"
           onClick={() => setShowForm(true)}
         >
-          Add Injury
+          Add Injury
         </button>
       </div>
 
-      {/* pop‑up form */}
+      {/* pop-up form */}
       {showForm && (
         <div className="absolute inset-0 bg-black/90 p-4 space-y-2 overflow-y-auto">
           <input
@@ -147,7 +146,7 @@ export default function InjuryPanel() {
             className="w-full bg-black/60 border border-white/40 py-1 hover:border-white"
             onClick={saveDraft}
           >
-            Save Injury
+            Save Injury
           </button>
         </div>
       )}

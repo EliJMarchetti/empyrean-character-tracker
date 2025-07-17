@@ -1,16 +1,21 @@
-/* Tailwind base */
+/* Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─────────────────────────────────────────────
-   Steel texture + dark overlay + white text
-────────────────────────────────────────────── */
+/* ─── global font (open-source courier-style) ─── */
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&display=swap');
+
+html {
+  font-family: 'Source Code Pro', 'Courier New', monospace;
+}
+
+/* ─── Steel texture + dark overlay ─── */
 .fixed-ui-bg {
-  background-image: url('/foreground.jpeg'); /*   <— note leading slash   */
+  background-image: url('/foreground.jpeg');       /* leading slash = public root */
   background-size: cover;
   background-position: center;
-  background-color: rgba(0, 0, 0, 0.55);     /* darken so text pops    */
+  background-color: rgba(0, 0, 0, 0.55);          /* overlay */
   background-blend-mode: multiply;
-  @apply text-white;                         /* keep all text white    */
+  color: #ffffff;
 }
