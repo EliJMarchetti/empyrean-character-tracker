@@ -3,8 +3,8 @@ import { useInjuries } from '../context/InjuryContext';
 
 const SLOT_MAX = 5;
 
-export default function InjuryPanel() {
-  const { injuries, add, update, remove } = useInjuries();
+export default function InjuryPanel({ storageKey = 'injuries' }) {
+  const { injuries, add, update, remove } = useInjuries(storageKey);
   const [showForm, setShowForm] = useState(false);
   const [draft, setDraft] = useState({
     name: '', severity: 1, effect: '', treatment: '', cure: '',
