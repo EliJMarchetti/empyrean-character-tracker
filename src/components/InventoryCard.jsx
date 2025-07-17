@@ -7,10 +7,9 @@ const SUITS = [
   { icon: '♠', word: 'Counterattack' },
 ];
 
-const WEAPON_RANGES = ['Melee', 'Ranged', 'Long Ranged'];
+const WEAPON_RANGES = ['Melee', 'Ranged', 'Long Ranged'];
 const MARKS = ['', '+', '++', '–', '––'];
 
-/* helper: suit color class */
 const suitClass = (icon, active) => {
   if (!active) return 'opacity-20';
   return icon === '♥' || icon === '♦' ? 'text-red-500' : 'text-black';
@@ -20,19 +19,15 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
   const [open, setOpen] = useState(false);
   const patch = p => onChange({ ...item, ...p });
 
-  /* ---- helpers --------------------------------------------------- */
-  const toggleSuit = icon =>
-    patch({ suit: item.suit === icon ? '' : icon });
-
+  const toggleSuit = icon => patch({ suit: item.suit === icon ? '' : icon });
   const nextMark = () =>
     patch({
       skillMark: MARKS[(MARKS.indexOf(item.skillMark || '') + 1) % MARKS.length],
     });
 
-  /* --------------------------------------------------------------- */
   return (
     <div className="bg-black/40 border border-white/20 mb-2">
-      {/* ------------ header --------------------------------------- */}
+      {/* ---------- header -------------------------------------- */}
       <div
         className="flex items-center justify-between px-3 py-2 cursor-pointer select-none"
         onClick={() => setOpen(o => !o)}
@@ -50,7 +45,7 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
             <span>{item.title || <em className="opacity-50">Untitled</em>}</span>
           )}
 
-          {/* Gear suit display */}
+          {/* gear suit display */}
           {item.type === 'gear' && item.suit && (
             <span className="ml-1">
               {item.suit}{' '}
@@ -58,11 +53,11 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
             </span>
           )}
 
-          {/* Weapon skill + mark – only when NOT editing */}
+          {/* weapon skill display when not editing */}
           {item.type === 'weapon' && !editable && (
             <span className="text-xs ml-1">
               ({item.skill || <em className="opacity-50">Skill</em>}
-              {item.skillMark && ` ${item.skillMark}`})
+              {item.skillMark && ` ${item.skillMark}`})
             </span>
           )}
         </div>
@@ -70,7 +65,7 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
         <span>{open ? '▾' : '▸'}</span>
       </div>
 
-      {/* ------------ body ----------------------------------------- */}
+      {/* ---------- body ---------------------------------------- */}
       {open && (
         <div className="px-3 pb-3">
           {/* ITEM --------------------------------------------------- */}
@@ -88,13 +83,15 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
           {/* GEAR --------------------------------------------------- */}
           {item.type === 'gear' && (
             <>
-              {/* suit picker */}
               {editable && (
                 <div className="mb-2 flex gap-1">
                   {SUITS.map(s => (
                     <button
                       key={s.icon}
-                      className={`px-2 ${suitClass(s.icon, item.suit === s.icon)}`}
+                      className={`px-2 ${suitClass(
+                        s.icon,
+                        item.suit === s.icon
+                      )}`}
                       onClick={() => toggleSuit(s.icon)}
                     >
                       {s.icon}
@@ -128,7 +125,6 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
           {/* WEAPON ------------------------------------------------- */}
           {item.type === 'weapon' && (
             <>
-              {/* range selector */}
               {editable ? (
                 <select
                   className="bg-black/60 mb-2 px-2 py-1 rounded border border-white/20"
@@ -143,7 +139,6 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
                 <p className="text-xs mb-2">{item.range}</p>
               )}
 
-              {/* skill + mark editor (only visible while editing) */}
               {editable && (
                 <div className="flex gap-2 mb-2">
                   <input
@@ -161,7 +156,6 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
                 </div>
               )}
 
-              {/* properties */}
               <label className="text-xs opacity-70">Properties</label>
               <textarea
                 className="w-full bg-transparent outline-none resize-none mb-3"
@@ -172,13 +166,12 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
                 onChange={e => patch({ properties: e.target.value })}
               />
 
-              {/* Injury block */}
               <div className="space-y-2">
                 <input
                   className="w-full bg-transparent outline-none"
                   value={item.injuryName}
                   readOnly={!editable}
-                  placeholder="Injury name…"
+                  placeholder="Injury name…"
                   onChange={e => patch({ injuryName: e.target.value })}
                 />
 
@@ -194,6 +187,71 @@ export default function InventoryCard({ item, editable, onChange, onDelete }) {
                   />
                 ))}
               </div>
+            </>
+          )}
+
+          {/* AUGMENT ---------------------------------------------- */}
+          {item.type === 'augment' && (
+            <>
+              {/* editor row */}
+              {editable && (
+                <div className="flex gap-2 mb-2">
+                  <select
+                    className="bg-black/60 px-2 py-1 border border-white/20"
+                    value={item.bioTech}
+                    onChange={e =>
+                      patch({
+                        bioTech: e.target.value,
+                        subType:
+                          e.target.value === 'Biological'
+                            ? 'Gene Editing ⚛'
+                            : 'Replacement ⛨',
+                      })
+                    }
+                  >
+                    <option>Biological</option>
+                    <option>Technological</option>
+                  </select>
+
+                  <select
+                    className="bg-black/60 px-2 py-1 border border-white/20 flex-1"
+                    value={item.subType}
+                    onChange={e => patch({ subType: e.target.value })}
+                  >
+                    {(item.bioTech === 'Biological'
+                      ? [
+                          'Gene Editing ⚛',
+                          'DNA Splicing ☣',
+                          'Radiation ☢',
+                        ]
+                      : [
+                          'Replacement ⛨',
+                          'Enhancement ⚠',
+                          'Automation ⚙',
+                        ]
+                    ).map(s => (
+                      <option key={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* read-only display when not editing */}
+              {!editable && (
+                <p className="text-xs mb-2">
+                  {item.bioTech} – {item.subType}
+                </p>
+              )}
+
+              {/* description */}
+              <textarea
+                className="w-full bg-transparent outline-none resize-none"
+                rows={3}
+                placeholder="Description…"
+                value={item.text}
+                readOnly={!editable}
+                onChange={e => patch({ text: e.target.value })}
+              />
             </>
           )}
 
